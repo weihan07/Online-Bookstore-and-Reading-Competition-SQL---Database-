@@ -1,0 +1,991 @@
+mysql> DROP DATABASE bookstore;
+Query OK, 14 rows affected (0.67 sec)
+
+mysql> CREATE DATABASE bookstore;
+Query OK, 1 row affected (0.01 sec)
+
+mysql> USE bookstore;
+Database changed
+mysql> 
+mysql> CREATE TABLE Publisher(
+    -> Publisher_ID VARCHAR(100) NOT NULL PRIMARY KEY,
+    -> Publisher_Name VARCHAR(100) NOT NULL,
+    -> Publisher_Address VARCHAR(100) NOT NULL,
+    -> Publisher_Phone VARCHAR(100)
+    -> );
+Query OK, 0 rows affected (0.03 sec)
+
+mysql> CREATE TABLE Author(
+    -> Author_ID VARCHAR(100) NOT NULL PRIMARY KEY,
+    -> Author_Name VARCHAR(100) NOT NULL,
+    -> Author_Address VARCHAR(100)
+    -> );
+Query OK, 0 rows affected (0.01 sec)
+
+mysql> CREATE TABLE Book(
+    -> Book_ISBN VARCHAR(100) NOT NULL PRIMARY KEY,
+    -> Author_ID VARCHAR(100) NOT NULL,
+    -> FOREIGN KEY(Author_ID) REFERENCES Author(Author_ID),
+    -> Publisher_ID VARCHAR(100) NOT NULL,
+    -> FOREIGN KEY(Publisher_ID) REFERENCES Publisher(Publisher_ID),
+    -> Book_Year INT,
+    -> Title VARCHAR(100) NOT NULL,
+    -> Price NUMERIC(19,2) NOT NULL,
+    -> Book_Type VARCHAR(100) NOT NULL
+    -> );
+Query OK, 0 rows affected (0.02 sec)
+
+mysql> CREATE TABLE Customer(
+    -> Customer_Email VARCHAR(100) NOT NULL PRIMARY KEY,
+    -> Customer_Name VARCHAR(100),
+    -> Customer_Phone VARCHAR(100) NOT NULL,
+    -> Customer_Address VARCHAR(100) NOT NULL
+    -> );
+Query OK, 0 rows affected (0.02 sec)
+
+mysql> CREATE TABLE ShoppingBasket(
+    -> ShoppingBasket_ID INT PRIMARY KEY AUTO_INCREMENT,
+    -> Customer_Email VARCHAR(100),
+    -> FOREIGN KEY(Customer_Email) REFERENCES Customer(Customer_Email),
+    -> Shopping_Date DATE
+    -> );
+Query OK, 0 rows affected (0.02 sec)
+
+mysql> CREATE TABLE ShoppingBasket_Book(
+    -> ShoppingBasket_ID INT NOT NULL,
+    -> FOREIGN KEY(ShoppingBasket_ID) REFERENCES ShoppingBasket(ShoppingBasket_ID),
+    -> Book_ISBN VARCHAR(100) NOT NULL,
+    -> FOREIGN KEY(Book_ISBN) REFERENCES Book(Book_ISBN),
+    -> PRIMARY KEY(ShoppingBasket_ID,Book_ISBN),
+    -> CountSBB INT
+    -> );
+Query OK, 0 rows affected (0.02 sec)
+
+mysql> CREATE TABLE OnlineBookstore(
+    -> Bookstore_Code VARCHAR(100) NOT NULL PRIMARY KEY,
+    -> Bookstore_Address VARCHAR(100),
+    -> Bookstore_Phone VARCHAR(100) NOT NULL
+    -> );
+Query OK, 0 rows affected (0.01 sec)
+
+mysql> CREATE TABLE Warehouse(
+    -> Warehouse_Code INT NOT NULL PRIMARY KEY,
+    -> Bookstore_Code VARCHAR(100),
+    -> FOREIGN KEY(Bookstore_Code) REFERENCES OnlineBookstore(Bookstore_Code),
+    -> Warehouse_Phone VARCHAR(100),
+    -> Warehouse_Address VARCHAR(100)
+    -> );
+Query OK, 0 rows affected (0.02 sec)
+
+mysql> CREATE TABLE Warehouse_Book(
+    -> Warehouse_Code INT NOT NULL,
+    -> FOREIGN KEY(Warehouse_Code) REFERENCES Warehouse(Warehouse_Code),
+    -> Book_ISBN VARCHAR(100) NOT NULL,
+    -> FOREIGN KEY(Book_ISBN) REFERENCES Book(Book_ISBN),
+    -> PRIMARY KEY(Warehouse_Code,Book_ISBN),
+    -> CountWB INT
+    -> );
+Query OK, 0 rows affected (0.02 sec)
+
+mysql> CREATE TABLE Staff(
+    -> Staff_ID VARCHAR(100) NOT NULL PRIMARY KEY,
+    -> Bookstore_Code VARCHAR(100),
+    -> FOREIGN KEY(Bookstore_Code) REFERENCES OnlineBookstore(Bookstore_Code),
+    -> Staff_Name VARCHAR(100) NOT NULL,
+    -> Staff_Mobile VARCHAR(100) NOT NULL,
+    -> Staff_Email VARCHAR(100)
+    -> );
+Query OK, 0 rows affected (0.02 sec)
+
+mysql> CREATE TABLE Participant(
+    -> Participant_ID VARCHAR(100) NOT NULL PRIMARY KEY,
+    -> Participant_Name VARCHAR(100),
+    -> Participant_Mobile VARCHAR(100) NOT NULL,
+    -> Participant_Address VARCHAR(100) NOT NULL,
+    -> Participant_Email VARCHAR(100),
+    -> Participant_Type VARCHAR(100)
+    -> );
+Query OK, 0 rows affected (0.01 sec)
+
+mysql> CREATE TABLE Competition(
+    -> Competition_ID VARCHAR(100) NOT NULL PRIMARY KEY,
+    -> Competition_Type VARCHAR(100),
+    -> Competition_Date DATE NOT NULL
+    -> );
+Query OK, 0 rows affected (0.01 sec)
+
+mysql> CREATE TABLE Score(
+    -> Score_ID VARCHAR(100) NOT NULL PRIMARY KEY,
+    -> Participant_ID VARCHAR(100) NOT NULL,
+    -> FOREIGN KEY(Participant_ID) REFERENCES Participant(Participant_ID),
+    -> Competition_ID VARCHAR(100) NOT NULL,
+    -> FOREIGN KEY(Competition_ID) REFERENCES Competition(Competition_ID),
+    -> Score_Total VARCHAR(100) NOT NULL
+    -> );
+Query OK, 0 rows affected (0.02 sec)
+
+mysql> CREATE TABLE Prize(
+    -> Prize_ID VARCHAR(100) NOT NULL PRIMARY KEY,
+    -> Score_ID VARCHAR(100) NOT NULL,
+    -> FOREIGN KEY(Score_ID) REFERENCES Score(Score_ID),
+    -> Participant_ID VARCHAR(100) NOT NULL,
+    -> FOREIGN KEY(Participant_ID) REFERENCES Participant(Participant_ID),
+    -> Staff_ID VARCHAR(100) NOT NULL,
+    -> FOREIGN KEY(Staff_ID) REFERENCES Staff(Staff_ID),
+    -> Prize_Name VARCHAR(100) NOT NULL
+    -> );
+Query OK, 0 rows affected (0.04 sec)
+
+mysql> ALTER TABLE Book
+    -> RENAME COLUMN Title TO Book_Title;
+Query OK, 0 rows affected (0.05 sec)
+Records: 0  Duplicates: 0  Warnings: 0
+
+mysql> ALTER TABLE Score
+    -> MODIFY Score_Total INT NOT NULL;
+Query OK, 0 rows affected (0.04 sec)
+Records: 0  Duplicates: 0  Warnings: 0
+
+mysql> INSERT INTO Author (Author_ID, Author_Name, Author_Address)
+    -> VALUES
+    -> ('A001','Yew Kwang Hui','No. 567, Jalan Putera, 46200 Petaling Jaya, Selangor'),
+    -> ('A002','Samsudin Abdullah bin Fakri','Lot 4892, Taman Desa, 80250 Johor Bharu, Johor'),
+    -> ('A003','Chetan A/L Bangla','No. 567, Jalan Raja Chulan, 50000 Kuala Lumpur, Kuala Lumpur'),
+    -> ('A004','Grace Wong Jie Hui','123-2A, Jalan Enstek 3/8, 71800 Nilai, Negeri Sembilan'),
+    -> ('A005','Siti Khadijah binti Kamal','Pt 2464, Taman Guchil Jaya, 18000 Kuala Krai, Kelantan'),
+    -> ('A006','Amrita A/P Pritia ','Lot 2953, Jalan Permai, 14020 Bukit Mertajam, Penang'),
+    -> ('A007','Uthaya A/L Sankar','No. 382, Taman Desa Intan, 11500 Ayer Itam, Pulau Pinang'),
+    -> ('A008','Lim Kit Ching','Pt. 3295, Jalan Maarof 2/3, 85000, Segamat, Johor'),
+    -> ('A009','Sarah Rosmah binti Abdullah','Lot. 253-7A, Jalan Desa Mawar, 11500 Ayer Itam, Pulau Pinang'),
+    -> ('A010','Ali Abdulah bin Ahmad','No. 46, Jalan Puteri, 10150 George Town, Pulau Pinang');
+Query OK, 10 rows affected (0.02 sec)
+Records: 10  Duplicates: 0  Warnings: 0
+
+mysql> 
+mysql> INSERT INTO Publisher (Publisher_ID, Publisher_Name, Publisher_Address, Publisher_Phone)
+    -> VALUES
+    -> ('P0001','Oxferd Fajar Sdn Bhd','999, Jalan Pemaju, 40150 Shah Alam, Selangor','03-5629400'),
+    -> ('P0002','GoldFish Book Sdn Bhd','No. 360, Lintang Macallum, 10300 George Town, Pulau Pinang','09-9994424'),
+    -> ('P0003','Hup Seng Book Sdn Bhd','5529, Jalan Marif 2/5, 59000 Bangsar, Selangor','01-4248892'),
+    -> ('P0004','Kanying Publication Sdn Bhd','35, Jalan Industri Kidamai,43000 Kajang, Selangor','04-2423949'),
+    -> ('P0005','Navinden Pubication Sdn Bhd','73, Jalan Maarof, Bangsar, 59000 Kuala Lumpur, Kuala Lumpur','03-2235490'),
+    -> ('P0006','Rosmah Book Sdn Bhd','No. 35, Block C5, Jalan Parameswara, 47301 Petaling Jaya, Selangor','06-8795292'),
+    -> ('P0007','Pernebit UM','C4-26, Bukit Bakar Industrial Area, 52100 Kepong, Kuala Lumpur','08-4837897'),
+    -> ('P0008','Pelangor Pubishing Group','Lot 22, Taman Perindustrian Ayer, 80250, Johor Bharu, Johor','07-0217474'),
+    -> ('P0009','Sental Press Sdn Bhd','B-4-C, Jalan Kenari 5, Alam Damai, 56000 Cheras, Kuala Lumpur','03-4258393'),
+    -> ('P0010','Ali Publication Sdn Bhd','58, Jalan Bukit 24/5, Seksyen 51 Petaling Jaya, 46200 Petaling Jaya, Selangor','02-2423490');
+Query OK, 10 rows affected (0.00 sec)
+Records: 10  Duplicates: 0  Warnings: 0
+
+mysql> 
+mysql> INSERT INTO Customer (Customer_Email, Customer_Name, Customer_Phone, Customer_Address)
+    -> VALUES
+    -> ('armiraaaa47@gmail.com','Nur Armira binti Syed Fairuz','014-1234122','Lot 74, Jalan Universiti, 46200 Petaling Jaya, Selangor'),
+    -> ('hajiftd8877@gmail.com','Haji Fathuddin bin Idham','011-74219300','No. 92, Jalan Burma, 10797 George Town, Pulau Pinang'),
+    -> ('slmisthebest32@gmail.com','Siew Loong Mon','019-8717818','61, Jalan Imbi, Imbi, 57070 Kuala Lumpur, Kuala Lumpur'),
+    -> ('preetaking007@gmail.com','Preeta A/L Selvaraju','018-2457636','58, Jalan Jubli Perak Seksyen, 40172 Shah Alam, Selangor'),
+    -> ('jessietjh20@gmail.com','Jessie Tan Jing Hui','016-4145675','4, Jalan Industri USJ, Taman Perindustrian Usj 1, 47631 Subang Jaya, Selangor'),
+    -> ('chendp007@gmail.com','Chen Dong Pin','012-9669098','No. 12 & 14A, Jalan Bentara 1, Taman Iskandar, 80050 Johor Bahru, Johor'),
+    -> ('syasya71@gmail.com','Syafina binti Fadillah','014-7739172','No. 36, Jalan 4, Laman Keramat, 21055 Bukit Besi, Terengganu'),
+    -> ('shoba99@gmail.com','Shoba Sundram A/P Pragash Ammasee','017-3217541','No. 067, Jalan 1/12, Taman Jordan, 31900 Kampar, Perak'),
+    -> ('zmchen11@gmail.com','Chen Zhi Ming','011-38380187','7, Jalan Medan Midah, Taman Midah, 59513 Kuala Lumpur,Kuala Lumpur'),
+    -> ('nazeem666@gmail.com','Nazeem Akmal bin Nik Zamani','010-8461063','No. 152, Jalan Lembah, Taman Tasek, 80200, Johor Bahru, Johor'),
+    -> ('loh888@gmail.com','Loh Jing Yi','011-4242421','61 & 61-A, Jalan Harimau Tarum, Taman Century, 80250 Johor Bahru, Johor'),
+    -> ('jycute73@gmail.com','Wong Jin Ying','016-5991059','35, Jalan Perpaduan, Desa Lawan Kuda, 31600 Gopeng, Perak');
+Query OK, 12 rows affected (0.00 sec)
+Records: 12  Duplicates: 0  Warnings: 0
+
+mysql> 
+mysql> INSERT INTO OnlineBookstore (Bookstore_Code, Bookstore_Address, Bookstore_Phone)
+    -> VALUES
+    -> ('BS001','Lot 358, Jalan Perpaduan, 40172 Shah Alam, Selangor','03-2312471'),
+    -> ('BS002','No. 3425, Jalan Jubli Perak, 31600 Gopeng, Perak','03-4743647'),
+    -> ('BS003','Lot 14, Jalan Permai, 85771 Skudai, Johor','03-9034892'),
+    -> ('BS004','2A-5-C, Jalan Wisma, 30300 Ipoh, Perak','09-3489124'),
+    -> ('BS005','No. 214, Jalan 5/2E, 47300 Petaling Jaya, Selangor','03-7467846'),
+    -> ('BS006','No. 49, Jalan Kecil, 59100 Bangsa Utama, Kuala Lumpur','06-9214714'),
+    -> ('BS007','No. 2, Jalan Bentara 4, 59513 Kuala Lumpur, Kuala Lumpur','08-9827481'),
+    -> ('BS008','34-D, Jalan Bukit Besi, 80250 Johor Bharu, Johor','01-2421444'),
+    -> ('BS009','37, Taman Desa, 10797 George Town, Pulau Pinang','02-2342342'),
+    -> ('BS010','6A-5, Jalan Industri 2/4, 47631 Subang Jaya, Selangor','04-3423424');
+Query OK, 10 rows affected (0.00 sec)
+Records: 10  Duplicates: 0  Warnings: 0
+
+mysql> 
+mysql> INSERT INTO Participant (Participant_ID, Participant_Name, Participant_Mobile, Participant_Address, Participant_Email, Participant_Type)
+    -> VALUES
+    -> ('PT001','Kelvin Liew Wei Wen','013-2305966','No.112, Jalan Merah, Kampung Gajah 31000, Perak','kelvin188@gmail.com','Malaysian'),
+    -> ('PT002','Vijaya A/P Rajeswaran','016-5121222','80, Jalan 2/35, USJ 42R, 85771 Skudai, Johor','vijaya86@gmail.com','Malaysian'),
+    -> ('PT003','Leong Zi Shan','015-4881327','No. 75, Jalan Wisma Putra 31T, PJS43, 50160 Titiwangsa, Kuala Lumpur','leong1327@gmail.com','Malaysian'),
+    -> ('PT004','Ahmad Muqri Bin Zahir','013-8156469','No. 31, Jalan Bukit Bintang 96Y, PJU3, 34163 Gua Tempurung, Perak','ahmadmm@gmail.com','Malaysian'),
+    -> ('PT005','Syed Saddiq Bin Muhammad','018-4476730','8P-10, Jalan 4/84D, Bandar Pinang, 72229 Sungai Gadut, Negeri Sembilan','syedsd6868@gmail.com','Malaysian'),
+    -> ('PT006','Mohamad Sanjaya Bin Kamal','011-45539966','No. 299, Jalan Dato Onn Jaafar, 30300 Ipoh, Perak','powersanjaya01@gmail.com','Malaysian'),
+    -> ('PT007','Nurul Farah Binti Abdulah Syabir','013-4330203','No. 168, Jalan Halaman Meriah, Taman Aman, 31800 Tanjong Tualang, Perak','farahhh53@gmail.com','Malaysian'),
+    -> ('PT008','Yogeshwaran A/L Kumar','010-8899283','No. 3-10, Jalan SS2/67, SS2, 47300 Petaling Jaya, Selangor','yogesh31@gmail.com','Malaysian'),
+    -> ('PT209','Chen Dong Pin','86-139-1099-8888','Beijing, Chaoyang District, Lihong Garden, Building 1, 18A.','chendp007@gmail.com','Foreigner'),
+    -> ('PT010','Leanne Lee Yan Ting','011-67677897','No. D88, Jalan Besar, 31900 Kampar, Perak','leanne86@gmail.com','Malaysian'),
+    -> ('PT011','Syafina binti Fadillah','014-773 9172','No. 36, Jalan 4, Laman Keramat, 21055 Bukit Besi, Terengganu','syasya71@gmail.com','Malaysian'),
+    -> ('PT212','Carla W. Jamerson','(555) 555-1234','132, My Street, Kingston, New York 12401.','carlacute111@gmail.com','Foreigner');
+Query OK, 12 rows affected (0.00 sec)
+Records: 12  Duplicates: 0  Warnings: 0
+
+mysql> 
+mysql> INSERT INTO Competition (Competition_ID, Competition_Type, Competition_Date)
+    -> VALUES
+    -> ('C0001','News Reader','2022-09-25'),
+    -> ('C0012','Fairy Story Telling','2022-10-23'),
+    -> ('C0023','Poetry Reading','2022-10-24'),
+    -> ('C0034','Spanish Challenge Reading Competition','2022-11-15'),
+    -> ('C0035','Japanese Challenge Reading Competition','2022-11-16'),
+    -> ('C0036','German Challenge Reading Competition','2022-11-17'),
+    -> ('C0037','Chinese Challenge Reading Competition','2022-11-18'),
+    -> ('C0042','Arabic Challenge Reading Competition','2022-12-20'),
+    -> ('C0044','Cantonese Challenge Reading Competition','2022-12-21'),
+    -> ('C0046','English Challenge Reading Competition','2022-12-22'),
+    -> ('C0053','Hokkien Challenge Reading Competition','2022-12-12'),
+    -> ('C0060','Bahasa Melayu Challenge Reading Competition','2022-10-20');
+Query OK, 12 rows affected (0.00 sec)
+Records: 12  Duplicates: 0  Warnings: 0
+
+mysql> 
+mysql> INSERT INTO Book (Book_ISBN, Author_ID, Publisher_ID, Book_Year, Book_Title, Price, Book_Type)
+    -> VALUES
+    -> ('978-1-60309-502-0','A008','P0004',2002,'Animal Stories',19.99,'Fiction'),
+    -> ('978-1-60309-454-2','A002','P0007',2003,'The Delicacy',24.99,'Fiction'),
+    -> ('978-1-60309-492-4','A004','P0003',2022,'Doughnuts and Doom',14.99, 'ExerciseBook'),
+    -> ('978-1-60309-513-6','A007','P0010',2017,'Highwater Pants',14.59, 'ExerciseBook'),
+    -> ('978-1-60309-514-3','A003','P0004',2018,'Under the River',24.99,'Fiction'),
+    -> ('978-1-60309-038-4','A001','P0006',2008,'Twinkle Power',9.95, 'ExerciseBook'),
+    -> ('978-1-60309-505-1','A005','P0002',1995,'The League of Extraordinary Gentlemen',29.95,'Fiction'),
+    -> ('978-1-60309-344-6','A009','P0004',1990,'Lost Girls',49.99,'Fiction'),
+    -> ('978-1-60309-504-4','A009','P0008',1991,'The Graphic Novel',14.95, 'ExerciseBook'),
+    -> ('978-1-891830-02-0','A010','P0009',2006,'A Comic Strip Biography',39.99,'Fiction');
+Query OK, 10 rows affected (0.00 sec)
+Records: 10  Duplicates: 0  Warnings: 0
+
+mysql> 
+mysql> INSERT INTO ShoppingBasket (ShoppingBasket_ID, Customer_Email, Shopping_Date)
+    -> VALUES
+    -> (20221229,'armiraaaa47@gmail.com','2022-11-10'),
+    -> (20221225,'hajiftd8877@gmail.com','2022-10-12'),
+    -> (20220103,'slmisthebest32@gmail.com','2022-08-16'),
+    -> (20220216,'preetaking007@gmail.com','2022-07-25'),
+    -> (20200102,'jessietjh20@gmail.com','2022-09-08'),
+    -> (20210938,'chendp007@gmail.com','2022-10-17'),
+    -> (20210987,'syasya71@gmail.com','2022-10-09'),
+    -> (20209876,'armiraaaa47@gmail.com','2022-11-12'),
+    -> (20198765,'zmchen11@gmail.com','2022-12-09'),
+    -> (20220308,'nazeem666@gmail.com','2022-12-01'),
+    -> (20179876,'loh888@gmail.com','2022-12-12'),
+    -> (20142578,'jycute73@gmail.com','2022-09-01');
+Query OK, 12 rows affected (0.00 sec)
+Records: 12  Duplicates: 0  Warnings: 0
+
+mysql> 
+mysql> INSERT INTO ShoppingBasket_Book (ShoppingBasket_ID, Book_ISBN, CountSBB)
+    -> VALUES
+    -> (20221229,'978-1-60309-502-0',4),
+    -> (20221225,'978-1-60309-454-2',7),
+    -> (20220103,'978-1-60309-492-4',3),
+    -> (20220216,'978-1-60309-513-6',2),
+    -> (20200102,'978-1-60309-514-3',4),
+    -> (20210938,'978-1-60309-038-4',14),
+    -> (20210987,'978-1-60309-505-1',23),
+    -> (20209876,'978-1-60309-344-6',12),
+    -> (20198765,'978-1-60309-504-4',1),
+    -> (20220308,'978-1-891830-02-0',2),
+    -> (20179876,'978-1-60309-505-1',6),
+    -> (20142578,'978-1-60309-513-6',3);
+Query OK, 12 rows affected (0.00 sec)
+Records: 12  Duplicates: 0  Warnings: 0
+
+mysql> 
+mysql> INSERT INTO Warehouse (Warehouse_Code, Bookstore_Code, Warehouse_Phone, Warehouse_Address)
+    -> VALUES
+    -> (432133,'BS001','03-3257209','Lot 345, Jalan Paramesara 1/4, 71800 Nilai, Negeri Sembilan'),
+    -> (493110,'BS002','03-4837264','Lot 98, Jalan Desa, 50000 Kuala Lumpur, Kuala Lumpur'),
+    -> (487411,'BS003','03-9742389','Lot 25, Jalan Putera 2/9, 85000 Segamat, Johor'),
+    -> (401548,'BS004','02-4937474','Lot 62, Jalan Abdullah 3/7, 43000 Kajang, Selangor'),
+    -> (437910,'BS005','01-9832424','Lot 262, Jalan Arif 3/8, 46200 Petaling Jaya, Selangor'),
+    -> (432750,'BS006','06-3242788','Lot 152, Jalan Bangsar, 52100 Kepong, Kuala Lumpur'),
+    -> (450929,'BS007','09-3423428','Lot 7A, Jalan Perak, 46200 Petaling Jaya, Selangor'),
+    -> (455685,'BS008','07-3444783','Lot D35, Jalan Minah, 80200 Johor Bharu, Johor'),
+    -> (428170,'BS009','05-3427398','Lot 2A, Jalan Perpaduan,  59513 Kuala Lumpur, Kuala Lumpur'),
+    -> (495979,'BS010','05-4234793','Lot 34, Jalan Permai S1, 40172 Shah Alam, Selangor'),
+    -> (443618,'BS004','01-8725892','Lot 274, Jalan Bukit Besi, 50160 Titiwangsa, Kuala Lumpur'),
+    -> (489320,'BS008','09-4238253','Lot 5A, Jalan Abdul, 43000 Kajang, Selangor');
+Query OK, 12 rows affected (0.00 sec)
+Records: 12  Duplicates: 0  Warnings: 0
+
+mysql> 
+mysql> INSERT INTO Warehouse_Book (Warehouse_Code, Book_ISBN, CountWB)
+    -> VALUES
+    -> (432133,'978-1-60309-502-0',4444),
+    -> (493110,'978-1-60309-454-2',3245),
+    -> (487411,'978-1-60309-492-4',3465),
+    -> (401548,'978-1-60309-513-6',2368),
+    -> (437910,'978-1-60309-514-3',8763),
+    -> (432750,'978-1-60309-038-4',4354),
+    -> (450929,'978-1-60309-505-1',2489),
+    -> (455685,'978-1-60309-344-6',6543),
+    -> (428170,'978-1-60309-504-4',5521),
+    -> (495979,'978-1-891830-02-0',4692),
+    -> (443618,'978-1-60309-513-6',9023),
+    -> (489320,'978-1-60309-038-4',1234);
+Query OK, 12 rows affected (0.00 sec)
+Records: 12  Duplicates: 0  Warnings: 0
+
+mysql> 
+mysql> INSERT INTO Staff (Staff_ID, Bookstore_Code, Staff_Name, Staff_Mobile, Staff_Email)
+    -> VALUES
+    -> ('ST023','BS001','Grace Lim Zi Wei','01-9956 4992','gracelimziwei@gmail.com'),
+    -> ('ST222','BS002','Alan Ching Khai Zhe','03-723 8872','alanchingkhaizhe@gmail.com'),
+    -> ('ST120','BS003','Khairul bin Abdul Rahman','04-879 6400','khairulbinabdulrahman@gmail.com'),
+    -> ('ST640','BS004','Danish a/l Thurgashini','07-992 0183','danishalthurgashini@gmail.com'),
+    -> ('ST270','BS005','Rosmah binti Hema','03-123 8493','rosmahbintihema@gmail.com'),
+    -> ('ST556','BS006','Syed Saddiq bin','03-829 9923','syedsaddiqbinabdul@gmail.com'),
+    -> ('ST762','BS007','Ken Fong Ka Quan','07-847 0327','kenfongkaquan@gmail.com'),
+    -> ('ST007','BS008','Dharshen a/l Danny','06-822 4572','dharshenaldanny@gmail.com'),
+    -> ('ST466','BS009','Lim Pek Sheng','07-921 0293','limpeksheng@gmail.com'),
+    -> ('ST189','BS010','David Lau Jing Luen','06-773 2200','davidlaujingleun@gmail.com'),
+    -> ('ST203','BS004','Christine Chong','03-990 0214','christinechong@gmail.com'),
+    -> ('ST822','BS008','Daniel Tan','03-280 0293','danieltan@gamil.com');
+Query OK, 12 rows affected (0.00 sec)
+Records: 12  Duplicates: 0  Warnings: 0
+
+mysql> 
+mysql> INSERT INTO Score (Score_ID, Participant_ID, Competition_ID, Score_Total)
+    -> VALUES
+    -> ('SD0007','PT001','C0001',645),
+    -> ('SD0208','PT002','C0012',756),
+    -> ('SD3009','PT003','C0023',858),
+    -> ('SD0110','PT004','C0034',452),
+    -> ('SD0217','PT005','C0035',654),
+    -> ('SD2012','PT006','C0036',999),
+    -> ('SD0713','PT007','C0037',425),
+    -> ('SD9014','PT008','C0042',534),
+    -> ('SD5015','PT209','C0044',756),
+    -> ('SD0612','PT010','C0046',657),
+    -> ('SD0070','PT011','C0053',895),
+    -> ('SD0820','PT212','C0060',666);
+Query OK, 12 rows affected (0.00 sec)
+Records: 12  Duplicates: 0  Warnings: 0
+
+mysql> 
+mysql> INSERT INTO Prize (Prize_ID, Score_ID, Participant_ID, Staff_ID, Prize_Name)
+    -> VALUES
+    -> ('PR001','SD0007','PT001','ST023','Book Voucher RM50'),
+    -> ('PR002','SD0208','PT002','ST222','Tng Voucher RM150'),
+    -> ('PR003','SD3009','PT003','ST120','Book Voucher RM150'),
+    -> ('PR004','SD0110','PT004','ST640','Tng Voucher RM120'),
+    -> ('PR005','SD0217','PT005','ST270','GrabPay Voucher RM100'),
+    -> ('PR006','SD2012','PT006','ST556','Lazada Voucher RM100'),
+    -> ('PR007','SD0713','PT007','ST762','Shopee Voucher RM120'),
+    -> ('PR008','SD9014','PT008','ST007','Tng Voucher RM120'),
+    -> ('PR009','SD5015','PT209','ST466','Shopee Voucher RM200'),
+    -> ('PR010','SD0612','PT010','ST189','Book Voucher RM200'),
+    -> ('PR011','SD0070','PT011','ST203','Lazada Voucher RM120'),
+    -> ('PR012','SD0820','PT212','ST822','Tng Voucher RM120');
+Query OK, 12 rows affected (0.00 sec)
+Records: 12  Duplicates: 0  Warnings: 0
+
+mysql> SELECT * FROM Author;
++-----------+-----------------------------+--------------------------------------------------------------+
+| Author_ID | Author_Name                 | Author_Address                                               |
++-----------+-----------------------------+--------------------------------------------------------------+
+| A001      | Yew Kwang Hui               | No. 567, Jalan Putera, 46200 Petaling Jaya, Selangor         |
+| A002      | Samsudin Abdullah bin Fakri | Lot 4892, Taman Desa, 80250 Johor Bharu, Johor               |
+| A003      | Chetan A/L Bangla           | No. 567, Jalan Raja Chulan, 50000 Kuala Lumpur, Kuala Lumpur |
+| A004      | Grace Wong Jie Hui          | 123-2A, Jalan Enstek 3/8, 71800 Nilai, Negeri Sembilan       |
+| A005      | Siti Khadijah binti Kamal   | Pt 2464, Taman Guchil Jaya, 18000 Kuala Krai, Kelantan       |
+| A006      | Amrita A/P Pritia           | Lot 2953, Jalan Permai, 14020 Bukit Mertajam, Penang         |
+| A007      | Uthaya A/L Sankar           | No. 382, Taman Desa Intan, 11500 Ayer Itam, Pulau Pinang     |
+| A008      | Lim Kit Ching               | Pt. 3295, Jalan Maarof 2/3, 85000, Segamat, Johor            |
+| A009      | Sarah Rosmah binti Abdullah | Lot. 253-7A, Jalan Desa Mawar, 11500 Ayer Itam, Pulau Pinang |
+| A010      | Ali Abdulah bin Ahmad       | No. 46, Jalan Puteri, 10150 George Town, Pulau Pinang        |
++-----------+-----------------------------+--------------------------------------------------------------+
+10 rows in set (0.02 sec)
+
+mysql> SELECT * FROM Publisher;
++--------------+-----------------------------+-------------------------------------------------------------------------------+-----------------+
+| Publisher_ID | Publisher_Name              | Publisher_Address                                                             | Publisher_Phone |
++--------------+-----------------------------+-------------------------------------------------------------------------------+-----------------+
+| P0001        | Oxferd Fajar Sdn Bhd        | 999, Jalan Pemaju, 40150 Shah Alam, Selangor                                  | 03-5629400      |
+| P0002        | GoldFish Book Sdn Bhd       | No. 360, Lintang Macallum, 10300 George Town, Pulau Pinang                    | 09-9994424      |
+| P0003        | Hup Seng Book Sdn Bhd       | 5529, Jalan Marif 2/5, 59000 Bangsar, Selangor                                | 01-4248892      |
+| P0004        | Kanying Publication Sdn Bhd | 35, Jalan Industri Kidamai,43000 Kajang, Selangor                             | 04-2423949      |
+| P0005        | Navinden Pubication Sdn Bhd | 73, Jalan Maarof, Bangsar, 59000 Kuala Lumpur, Kuala Lumpur                   | 03-2235490      |
+| P0006        | Rosmah Book Sdn Bhd         | No. 35, Block C5, Jalan Parameswara, 47301 Petaling Jaya, Selangor            | 06-8795292      |
+| P0007        | Pernebit UM                 | C4-26, Bukit Bakar Industrial Area, 52100 Kepong, Kuala Lumpur                | 08-4837897      |
+| P0008        | Pelangor Pubishing Group    | Lot 22, Taman Perindustrian Ayer, 80250, Johor Bharu, Johor                   | 07-0217474      |
+| P0009        | Sental Press Sdn Bhd        | B-4-C, Jalan Kenari 5, Alam Damai, 56000 Cheras, Kuala Lumpur                 | 03-4258393      |
+| P0010        | Ali Publication Sdn Bhd     | 58, Jalan Bukit 24/5, Seksyen 51 Petaling Jaya, 46200 Petaling Jaya, Selangor | 02-2423490      |
++--------------+-----------------------------+-------------------------------------------------------------------------------+-----------------+
+10 rows in set (0.00 sec)
+
+mysql> SELECT * FROM Customer;
++--------------------------+-----------------------------------+----------------+-------------------------------------------------------------------------------+
+| Customer_Email           | Customer_Name                     | Customer_Phone | Customer_Address                                                              |
++--------------------------+-----------------------------------+----------------+-------------------------------------------------------------------------------+
+| armiraaaa47@gmail.com    | Nur Armira binti Syed Fairuz      | 014-1234122    | Lot 74, Jalan Universiti, 46200 Petaling Jaya, Selangor                       |
+| chendp007@gmail.com      | Chen Dong Pin                     | 012-9669098    | No. 12 & 14A, Jalan Bentara 1, Taman Iskandar, 80050 Johor Bahru, Johor       |
+| hajiftd8877@gmail.com    | Haji Fathuddin bin Idham          | 011-74219300   | No. 92, Jalan Burma, 10797 George Town, Pulau Pinang                          |
+| jessietjh20@gmail.com    | Jessie Tan Jing Hui               | 016-4145675    | 4, Jalan Industri USJ, Taman Perindustrian Usj 1, 47631 Subang Jaya, Selangor |
+| jycute73@gmail.com       | Wong Jin Ying                     | 016-5991059    | 35, Jalan Perpaduan, Desa Lawan Kuda, 31600 Gopeng, Perak                     |
+| loh888@gmail.com         | Loh Jing Yi                       | 011-4242421    | 61 & 61-A, Jalan Harimau Tarum, Taman Century, 80250 Johor Bahru, Johor       |
+| nazeem666@gmail.com      | Nazeem Akmal bin Nik Zamani       | 010-8461063    | No. 152, Jalan Lembah, Taman Tasek, 80200, Johor Bahru, Johor                 |
+| preetaking007@gmail.com  | Preeta A/L Selvaraju              | 018-2457636    | 58, Jalan Jubli Perak Seksyen, 40172 Shah Alam, Selangor                      |
+| shoba99@gmail.com        | Shoba Sundram A/P Pragash Ammasee | 017-3217541    | No. 067, Jalan 1/12, Taman Jordan, 31900 Kampar, Perak                        |
+| slmisthebest32@gmail.com | Siew Loong Mon                    | 019-8717818    | 61, Jalan Imbi, Imbi, 57070 Kuala Lumpur, Kuala Lumpur                        |
+| syasya71@gmail.com       | Syafina binti Fadillah            | 014-7739172    | No. 36, Jalan 4, Laman Keramat, 21055 Bukit Besi, Terengganu                  |
+| zmchen11@gmail.com       | Chen Zhi Ming                     | 011-38380187   | 7, Jalan Medan Midah, Taman Midah, 59513 Kuala Lumpur,Kuala Lumpur            |
++--------------------------+-----------------------------------+----------------+-------------------------------------------------------------------------------+
+12 rows in set (0.00 sec)
+
+mysql> SELECT * FROM Participant;
++----------------+----------------------------------+--------------------+-------------------------------------------------------------------------+--------------------------+------------------+
+| Participant_ID | Participant_Name                 | Participant_Mobile | Participant_Address                                                     | Participant_Email        | Participant_Type |
++----------------+----------------------------------+--------------------+-------------------------------------------------------------------------+--------------------------+------------------+
+| PT001          | Kelvin Liew Wei Wen              | 013-2305966        | No.112, Jalan Merah, Kampung Gajah 31000, Perak                         | kelvin188@gmail.com      | Malaysian        |
+| PT002          | Vijaya A/P Rajeswaran            | 016-5121222        | 80, Jalan 2/35, USJ 42R, 85771 Skudai, Johor                            | vijaya86@gmail.com       | Malaysian        |
+| PT003          | Leong Zi Shan                    | 015-4881327        | No. 75, Jalan Wisma Putra 31T, PJS43, 50160 Titiwangsa, Kuala Lumpur    | leong1327@gmail.com      | Malaysian        |
+| PT004          | Ahmad Muqri Bin Zahir            | 013-8156469        | No. 31, Jalan Bukit Bintang 96Y, PJU3, 34163 Gua Tempurung, Perak       | ahmadmm@gmail.com        | Malaysian        |
+| PT005          | Syed Saddiq Bin Muhammad         | 018-4476730        | 8P-10, Jalan 4/84D, Bandar Pinang, 72229 Sungai Gadut, Negeri Sembilan  | syedsd6868@gmail.com     | Malaysian        |
+| PT006          | Mohamad Sanjaya Bin Kamal        | 011-45539966       | No. 299, Jalan Dato Onn Jaafar, 30300 Ipoh, Perak                       | powersanjaya01@gmail.com | Malaysian        |
+| PT007          | Nurul Farah Binti Abdulah Syabir | 013-4330203        | No. 168, Jalan Halaman Meriah, Taman Aman, 31800 Tanjong Tualang, Perak | farahhh53@gmail.com      | Malaysian        |
+| PT008          | Yogeshwaran A/L Kumar            | 010-8899283        | No. 3-10, Jalan SS2/67, SS2, 47300 Petaling Jaya, Selangor              | yogesh31@gmail.com       | Malaysian        |
+| PT010          | Leanne Lee Yan Ting              | 011-67677897       | No. D88, Jalan Besar, 31900 Kampar, Perak                               | leanne86@gmail.com       | Malaysian        |
+| PT011          | Syafina binti Fadillah           | 014-773 9172       | No. 36, Jalan 4, Laman Keramat, 21055 Bukit Besi, Terengganu            | syasya71@gmail.com       | Malaysian        |
+| PT209          | Chen Dong Pin                    | 86-139-1099-8888   | Beijing, Chaoyang District, Lihong Garden, Building 1, 18A.             | chendp007@gmail.com      | Foreigner        |
+| PT212          | Carla W. Jamerson                | (555) 555-1234     | 132, My Street, Kingston, New York 12401.                               | carlacute111@gmail.com   | Foreigner        |
++----------------+----------------------------------+--------------------+-------------------------------------------------------------------------+--------------------------+------------------+
+12 rows in set (0.00 sec)
+
+mysql> SELECT * FROM OnlineBookstore;
++----------------+----------------------------------------------------------+-----------------+
+| Bookstore_Code | Bookstore_Address                                        | Bookstore_Phone |
++----------------+----------------------------------------------------------+-----------------+
+| BS001          | Lot 358, Jalan Perpaduan, 40172 Shah Alam, Selangor      | 03-2312471      |
+| BS002          | No. 3425, Jalan Jubli Perak, 31600 Gopeng, Perak         | 03-4743647      |
+| BS003          | Lot 14, Jalan Permai, 85771 Skudai, Johor                | 03-9034892      |
+| BS004          | 2A-5-C, Jalan Wisma, 30300 Ipoh, Perak                   | 09-3489124      |
+| BS005          | No. 214, Jalan 5/2E, 47300 Petaling Jaya, Selangor       | 03-7467846      |
+| BS006          | No. 49, Jalan Kecil, 59100 Bangsa Utama, Kuala Lumpur    | 06-9214714      |
+| BS007          | No. 2, Jalan Bentara 4, 59513 Kuala Lumpur, Kuala Lumpur | 08-9827481      |
+| BS008          | 34-D, Jalan Bukit Besi, 80250 Johor Bharu, Johor         | 01-2421444      |
+| BS009          | 37, Taman Desa, 10797 George Town, Pulau Pinang          | 02-2342342      |
+| BS010          | 6A-5, Jalan Industri 2/4, 47631 Subang Jaya, Selangor    | 04-3423424      |
++----------------+----------------------------------------------------------+-----------------+
+10 rows in set (0.00 sec)
+
+mysql> SELECT * FROM Competition;
++----------------+---------------------------------------------+------------------+
+| Competition_ID | Competition_Type                            | Competition_Date |
++----------------+---------------------------------------------+------------------+
+| C0001          | News Reader                                 | 2022-09-25       |
+| C0012          | Fairy Story Telling                         | 2022-10-23       |
+| C0023          | Poetry Reading                              | 2022-10-24       |
+| C0034          | Spanish Challenge Reading Competition       | 2022-11-15       |
+| C0035          | Japanese Challenge Reading Competition      | 2022-11-16       |
+| C0036          | German Challenge Reading Competition        | 2022-11-17       |
+| C0037          | Chinese Challenge Reading Competition       | 2022-11-18       |
+| C0042          | Arabic Challenge Reading Competition        | 2022-12-20       |
+| C0044          | Cantonese Challenge Reading Competition     | 2022-12-21       |
+| C0046          | English Challenge Reading Competition       | 2022-12-22       |
+| C0053          | Hokkien Challenge Reading Competition       | 2022-12-12       |
+| C0060          | Bahasa Melayu Challenge Reading Competition | 2022-10-20       |
++----------------+---------------------------------------------+------------------+
+12 rows in set (0.00 sec)
+
+mysql> SELECT * FROM Book;
++-------------------+-----------+--------------+-----------+---------------------------------------+-------+--------------+
+| Book_ISBN         | Author_ID | Publisher_ID | Book_Year | Book_Title                            | Price | Book_Type    |
++-------------------+-----------+--------------+-----------+---------------------------------------+-------+--------------+
+| 978-1-60309-038-4 | A001      | P0006        |      2008 | Twinkle Power                         |  9.95 | ExerciseBook |
+| 978-1-60309-344-6 | A009      | P0004        |      1990 | Lost Girls                            | 49.99 | Fiction      |
+| 978-1-60309-454-2 | A002      | P0007        |      2003 | The Delicacy                          | 24.99 | Fiction      |
+| 978-1-60309-492-4 | A004      | P0003        |      2022 | Doughnuts and Doom                    | 14.99 | ExerciseBook |
+| 978-1-60309-502-0 | A008      | P0004        |      2002 | Animal Stories                        | 19.99 | Fiction      |
+| 978-1-60309-504-4 | A009      | P0008        |      1991 | The Graphic Novel                     | 14.95 | ExerciseBook |
+| 978-1-60309-505-1 | A005      | P0002        |      1995 | The League of Extraordinary Gentlemen | 29.95 | Fiction      |
+| 978-1-60309-513-6 | A007      | P0010        |      2017 | Highwater Pants                       | 14.59 | ExerciseBook |
+| 978-1-60309-514-3 | A003      | P0004        |      2018 | Under the River                       | 24.99 | Fiction      |
+| 978-1-891830-02-0 | A010      | P0009        |      2006 | A Comic Strip Biography               | 39.99 | Fiction      |
++-------------------+-----------+--------------+-----------+---------------------------------------+-------+--------------+
+10 rows in set (0.01 sec)
+
+mysql> SELECT * FROM ShoppingBasket;
++-------------------+--------------------------+---------------+
+| ShoppingBasket_ID | Customer_Email           | Shopping_Date |
++-------------------+--------------------------+---------------+
+|          20142578 | jycute73@gmail.com       | 2022-09-01    |
+|          20179876 | loh888@gmail.com         | 2022-12-12    |
+|          20198765 | zmchen11@gmail.com       | 2022-12-09    |
+|          20200102 | jessietjh20@gmail.com    | 2022-09-08    |
+|          20209876 | armiraaaa47@gmail.com    | 2022-11-12    |
+|          20210938 | chendp007@gmail.com      | 2022-10-17    |
+|          20210987 | syasya71@gmail.com       | 2022-10-09    |
+|          20220103 | slmisthebest32@gmail.com | 2022-08-16    |
+|          20220216 | preetaking007@gmail.com  | 2022-07-25    |
+|          20220308 | nazeem666@gmail.com      | 2022-12-01    |
+|          20221225 | hajiftd8877@gmail.com    | 2022-10-12    |
+|          20221229 | armiraaaa47@gmail.com    | 2022-11-10    |
++-------------------+--------------------------+---------------+
+12 rows in set (0.00 sec)
+
+mysql> SELECT * FROM ShoppingBasket_Book;
++-------------------+-------------------+----------+
+| ShoppingBasket_ID | Book_ISBN         | CountSBB |
++-------------------+-------------------+----------+
+|          20142578 | 978-1-60309-513-6 |        3 |
+|          20179876 | 978-1-60309-505-1 |        6 |
+|          20198765 | 978-1-60309-504-4 |        1 |
+|          20200102 | 978-1-60309-514-3 |        4 |
+|          20209876 | 978-1-60309-344-6 |       12 |
+|          20210938 | 978-1-60309-038-4 |       14 |
+|          20210987 | 978-1-60309-505-1 |       23 |
+|          20220103 | 978-1-60309-492-4 |        3 |
+|          20220216 | 978-1-60309-513-6 |        2 |
+|          20220308 | 978-1-891830-02-0 |        2 |
+|          20221225 | 978-1-60309-454-2 |        7 |
+|          20221229 | 978-1-60309-502-0 |        4 |
++-------------------+-------------------+----------+
+12 rows in set (0.00 sec)
+
+mysql> SELECT * FROM Warehouse;
++----------------+----------------+-----------------+-------------------------------------------------------------+
+| Warehouse_Code | Bookstore_Code | Warehouse_Phone | Warehouse_Address                                           |
++----------------+----------------+-----------------+-------------------------------------------------------------+
+|         401548 | BS004          | 02-4937474      | Lot 62, Jalan Abdullah 3/7, 43000 Kajang, Selangor          |
+|         428170 | BS009          | 05-3427398      | Lot 2A, Jalan Perpaduan,  59513 Kuala Lumpur, Kuala Lumpur  |
+|         432133 | BS001          | 03-3257209      | Lot 345, Jalan Paramesara 1/4, 71800 Nilai, Negeri Sembilan |
+|         432750 | BS006          | 06-3242788      | Lot 152, Jalan Bangsar, 52100 Kepong, Kuala Lumpur          |
+|         437910 | BS005          | 01-9832424      | Lot 262, Jalan Arif 3/8, 46200 Petaling Jaya, Selangor      |
+|         443618 | BS004          | 01-8725892      | Lot 274, Jalan Bukit Besi, 50160 Titiwangsa, Kuala Lumpur   |
+|         450929 | BS007          | 09-3423428      | Lot 7A, Jalan Perak, 46200 Petaling Jaya, Selangor          |
+|         455685 | BS008          | 07-3444783      | Lot D35, Jalan Minah, 80200 Johor Bharu, Johor              |
+|         487411 | BS003          | 03-9742389      | Lot 25, Jalan Putera 2/9, 85000 Segamat, Johor              |
+|         489320 | BS008          | 09-4238253      | Lot 5A, Jalan Abdul, 43000 Kajang, Selangor                 |
+|         493110 | BS002          | 03-4837264      | Lot 98, Jalan Desa, 50000 Kuala Lumpur, Kuala Lumpur        |
+|         495979 | BS010          | 05-4234793      | Lot 34, Jalan Permai S1, 40172 Shah Alam, Selangor          |
++----------------+----------------+-----------------+-------------------------------------------------------------+
+12 rows in set (0.00 sec)
+
+mysql> SELECT * FROM Warehouse_Book;
++----------------+-------------------+---------+
+| Warehouse_Code | Book_ISBN         | CountWB |
++----------------+-------------------+---------+
+|         401548 | 978-1-60309-513-6 |    2368 |
+|         428170 | 978-1-60309-504-4 |    5521 |
+|         432133 | 978-1-60309-502-0 |    4444 |
+|         432750 | 978-1-60309-038-4 |    4354 |
+|         437910 | 978-1-60309-514-3 |    8763 |
+|         443618 | 978-1-60309-513-6 |    9023 |
+|         450929 | 978-1-60309-505-1 |    2489 |
+|         455685 | 978-1-60309-344-6 |    6543 |
+|         487411 | 978-1-60309-492-4 |    3465 |
+|         489320 | 978-1-60309-038-4 |    1234 |
+|         493110 | 978-1-60309-454-2 |    3245 |
+|         495979 | 978-1-891830-02-0 |    4692 |
++----------------+-------------------+---------+
+12 rows in set (0.00 sec)
+
+mysql> SELECT * FROM Staff;
++----------+----------------+--------------------------+--------------+---------------------------------+
+| Staff_ID | Bookstore_Code | Staff_Name               | Staff_Mobile | Staff_Email                     |
++----------+----------------+--------------------------+--------------+---------------------------------+
+| ST007    | BS008          | Dharshen a/l Danny       | 06-822 4572  | dharshenaldanny@gmail.com       |
+| ST023    | BS001          | Grace Lim Zi Wei         | 01-9956 4992 | gracelimziwei@gmail.com         |
+| ST120    | BS003          | Khairul bin Abdul Rahman | 04-879 6400  | khairulbinabdulrahman@gmail.com |
+| ST189    | BS010          | David Lau Jing Luen      | 06-773 2200  | davidlaujingleun@gmail.com      |
+| ST203    | BS004          | Christine Chong          | 03-990 0214  | christinechong@gmail.com        |
+| ST222    | BS002          | Alan Ching Khai Zhe      | 03-723 8872  | alanchingkhaizhe@gmail.com      |
+| ST270    | BS005          | Rosmah binti Hema        | 03-123 8493  | rosmahbintihema@gmail.com       |
+| ST466    | BS009          | Lim Pek Sheng            | 07-921 0293  | limpeksheng@gmail.com           |
+| ST556    | BS006          | Syed Saddiq bin          | 03-829 9923  | syedsaddiqbinabdul@gmail.com    |
+| ST640    | BS004          | Danish a/l Thurgashini   | 07-992 0183  | danishalthurgashini@gmail.com   |
+| ST762    | BS007          | Ken Fong Ka Quan         | 07-847 0327  | kenfongkaquan@gmail.com         |
+| ST822    | BS008          | Daniel Tan               | 03-280 0293  | danieltan@gamil.com             |
++----------+----------------+--------------------------+--------------+---------------------------------+
+12 rows in set (0.00 sec)
+
+mysql> SELECT * FROM Score;
++----------+----------------+----------------+-------------+
+| Score_ID | Participant_ID | Competition_ID | Score_Total |
++----------+----------------+----------------+-------------+
+| SD0007   | PT001          | C0001          |         645 |
+| SD0070   | PT011          | C0053          |         895 |
+| SD0110   | PT004          | C0034          |         452 |
+| SD0208   | PT002          | C0012          |         756 |
+| SD0217   | PT005          | C0035          |         654 |
+| SD0612   | PT010          | C0046          |         657 |
+| SD0713   | PT007          | C0037          |         425 |
+| SD0820   | PT212          | C0060          |         666 |
+| SD2012   | PT006          | C0036          |         999 |
+| SD3009   | PT003          | C0023          |         858 |
+| SD5015   | PT209          | C0044          |         756 |
+| SD9014   | PT008          | C0042          |         534 |
++----------+----------------+----------------+-------------+
+12 rows in set (0.00 sec)
+
+mysql> SELECT * FROM Prize;
++----------+----------+----------------+----------+-----------------------+
+| Prize_ID | Score_ID | Participant_ID | Staff_ID | Prize_Name            |
++----------+----------+----------------+----------+-----------------------+
+| PR001    | SD0007   | PT001          | ST023    | Book Voucher RM50     |
+| PR002    | SD0208   | PT002          | ST222    | Tng Voucher RM150     |
+| PR003    | SD3009   | PT003          | ST120    | Book Voucher RM150    |
+| PR004    | SD0110   | PT004          | ST640    | Tng Voucher RM120     |
+| PR005    | SD0217   | PT005          | ST270    | GrabPay Voucher RM100 |
+| PR006    | SD2012   | PT006          | ST556    | Lazada Voucher RM100  |
+| PR007    | SD0713   | PT007          | ST762    | Shopee Voucher RM120  |
+| PR008    | SD9014   | PT008          | ST007    | Tng Voucher RM120     |
+| PR009    | SD5015   | PT209          | ST466    | Shopee Voucher RM200  |
+| PR010    | SD0612   | PT010          | ST189    | Book Voucher RM200    |
+| PR011    | SD0070   | PT011          | ST203    | Lazada Voucher RM120  |
+| PR012    | SD0820   | PT212          | ST822    | Tng Voucher RM120     |
++----------+----------+----------------+----------+-----------------------+
+12 rows in set (0.00 sec)
+
+mysql> UPDATE Book
+    -> SET Price = 16.95
+    -> WHERE Book_ISBN = '978-1-60309-038-4';
+Query OK, 1 row affected (0.02 sec)
+Rows matched: 1  Changed: 1  Warnings: 0
+
+mysql> SELECT * FROM Book;
++-------------------+-----------+--------------+-----------+---------------------------------------+-------+--------------+
+| Book_ISBN         | Author_ID | Publisher_ID | Book_Year | Book_Title                            | Price | Book_Type    |
++-------------------+-----------+--------------+-----------+---------------------------------------+-------+--------------+
+| 978-1-60309-038-4 | A001      | P0006        |      2008 | Twinkle Power                         | 16.95 | ExerciseBook |
+| 978-1-60309-344-6 | A009      | P0004        |      1990 | Lost Girls                            | 49.99 | Fiction      |
+| 978-1-60309-454-2 | A002      | P0007        |      2003 | The Delicacy                          | 24.99 | Fiction      |
+| 978-1-60309-492-4 | A004      | P0003        |      2022 | Doughnuts and Doom                    | 14.99 | ExerciseBook |
+| 978-1-60309-502-0 | A008      | P0004        |      2002 | Animal Stories                        | 19.99 | Fiction      |
+| 978-1-60309-504-4 | A009      | P0008        |      1991 | The Graphic Novel                     | 14.95 | ExerciseBook |
+| 978-1-60309-505-1 | A005      | P0002        |      1995 | The League of Extraordinary Gentlemen | 29.95 | Fiction      |
+| 978-1-60309-513-6 | A007      | P0010        |      2017 | Highwater Pants                       | 14.59 | ExerciseBook |
+| 978-1-60309-514-3 | A003      | P0004        |      2018 | Under the River                       | 24.99 | Fiction      |
+| 978-1-891830-02-0 | A010      | P0009        |      2006 | A Comic Strip Biography               | 39.99 | Fiction      |
++-------------------+-----------+--------------+-----------+---------------------------------------+-------+--------------+
+10 rows in set (0.00 sec)
+
+mysql> UPDATE Staff
+    -> SET Staff_Mobile= '03-7710 0110'
+    -> WHERE Staff_ID='ST023';
+Query OK, 1 row affected (0.00 sec)
+Rows matched: 1  Changed: 1  Warnings: 0
+
+mysql> SELECT* FROM Staff; 
++----------+----------------+--------------------------+--------------+---------------------------------+
+| Staff_ID | Bookstore_Code | Staff_Name               | Staff_Mobile | Staff_Email                     |
++----------+----------------+--------------------------+--------------+---------------------------------+
+| ST007    | BS008          | Dharshen a/l Danny       | 06-822 4572  | dharshenaldanny@gmail.com       |
+| ST023    | BS001          | Grace Lim Zi Wei         | 03-7710 0110 | gracelimziwei@gmail.com         |
+| ST120    | BS003          | Khairul bin Abdul Rahman | 04-879 6400  | khairulbinabdulrahman@gmail.com |
+| ST189    | BS010          | David Lau Jing Luen      | 06-773 2200  | davidlaujingleun@gmail.com      |
+| ST203    | BS004          | Christine Chong          | 03-990 0214  | christinechong@gmail.com        |
+| ST222    | BS002          | Alan Ching Khai Zhe      | 03-723 8872  | alanchingkhaizhe@gmail.com      |
+| ST270    | BS005          | Rosmah binti Hema        | 03-123 8493  | rosmahbintihema@gmail.com       |
+| ST466    | BS009          | Lim Pek Sheng            | 07-921 0293  | limpeksheng@gmail.com           |
+| ST556    | BS006          | Syed Saddiq bin          | 03-829 9923  | syedsaddiqbinabdul@gmail.com    |
+| ST640    | BS004          | Danish a/l Thurgashini   | 07-992 0183  | danishalthurgashini@gmail.com   |
+| ST762    | BS007          | Ken Fong Ka Quan         | 07-847 0327  | kenfongkaquan@gmail.com         |
+| ST822    | BS008          | Daniel Tan               | 03-280 0293  | danieltan@gamil.com             |
++----------+----------------+--------------------------+--------------+---------------------------------+
+12 rows in set (0.00 sec)
+
+mysql> DELETE FROM Publisher
+    -> WHERE Publisher_ID='P0005';
+Query OK, 1 row affected (0.01 sec)
+
+mysql> SELECT * FROM Publisher;
++--------------+-----------------------------+-------------------------------------------------------------------------------+-----------------+
+| Publisher_ID | Publisher_Name              | Publisher_Address                                                             | Publisher_Phone |
++--------------+-----------------------------+-------------------------------------------------------------------------------+-----------------+
+| P0001        | Oxferd Fajar Sdn Bhd        | 999, Jalan Pemaju, 40150 Shah Alam, Selangor                                  | 03-5629400      |
+| P0002        | GoldFish Book Sdn Bhd       | No. 360, Lintang Macallum, 10300 George Town, Pulau Pinang                    | 09-9994424      |
+| P0003        | Hup Seng Book Sdn Bhd       | 5529, Jalan Marif 2/5, 59000 Bangsar, Selangor                                | 01-4248892      |
+| P0004        | Kanying Publication Sdn Bhd | 35, Jalan Industri Kidamai,43000 Kajang, Selangor                             | 04-2423949      |
+| P0006        | Rosmah Book Sdn Bhd         | No. 35, Block C5, Jalan Parameswara, 47301 Petaling Jaya, Selangor            | 06-8795292      |
+| P0007        | Pernebit UM                 | C4-26, Bukit Bakar Industrial Area, 52100 Kepong, Kuala Lumpur                | 08-4837897      |
+| P0008        | Pelangor Pubishing Group    | Lot 22, Taman Perindustrian Ayer, 80250, Johor Bharu, Johor                   | 07-0217474      |
+| P0009        | Sental Press Sdn Bhd        | B-4-C, Jalan Kenari 5, Alam Damai, 56000 Cheras, Kuala Lumpur                 | 03-4258393      |
+| P0010        | Ali Publication Sdn Bhd     | 58, Jalan Bukit 24/5, Seksyen 51 Petaling Jaya, 46200 Petaling Jaya, Selangor | 02-2423490      |
++--------------+-----------------------------+-------------------------------------------------------------------------------+-----------------+
+9 rows in set (0.00 sec)
+
+mysql> SELECT * FROM Book
+    -> WHERE Publisher_ID='P0004';
++-------------------+-----------+--------------+-----------+-----------------+-------+-----------+
+| Book_ISBN         | Author_ID | Publisher_ID | Book_Year | Book_Title      | Price | Book_Type |
++-------------------+-----------+--------------+-----------+-----------------+-------+-----------+
+| 978-1-60309-344-6 | A009      | P0004        |      1990 | Lost Girls      | 49.99 | Fiction   |
+| 978-1-60309-502-0 | A008      | P0004        |      2002 | Animal Stories  | 19.99 | Fiction   |
+| 978-1-60309-514-3 | A003      | P0004        |      2018 | Under the River | 24.99 | Fiction   |
++-------------------+-----------+--------------+-----------+-----------------+-------+-----------+
+3 rows in set (0.01 sec)
+
+mysql> SELECT C.Customer_Email, Customer_Name, SUM(CountSBB) AS 'Total Book Purchased'
+    -> FROM Customer AS C, ShoppingBasket AS S , ShoppingBasket_Book AS B
+    -> WHERE C.Customer_Email=S.Customer_Email
+    -> AND S.ShoppingBasket_ID=B.ShoppingBasket_ID
+    -> GROUP BY C.Customer_Email
+    -> HAVING SUM(CountSBB) > 10;
++-----------------------+------------------------------+----------------------+
+| Customer_Email        | Customer_Name                | Total Book Purchased |
++-----------------------+------------------------------+----------------------+
+| armiraaaa47@gmail.com | Nur Armira binti Syed Fairuz |                   16 |
+| chendp007@gmail.com   | Chen Dong Pin                |                   14 |
+| syasya71@gmail.com    | Syafina binti Fadillah       |                   23 |
++-----------------------+------------------------------+----------------------+
+3 rows in set (0.02 sec)
+
+mysql> SELECT P.Publisher_ID, Publisher_Name, Count(Book_Title) AS 'Number of published books purchased'
+    -> FROM Publisher as P, Book
+    -> WHERE P.Publisher_ID=Book.Publisher_ID
+    -> GROUP BY P.Publisher_ID;
++--------------+-----------------------------+-------------------------------------+
+| Publisher_ID | Publisher_Name              | Number of published books purchased |
++--------------+-----------------------------+-------------------------------------+
+| P0002        | GoldFish Book Sdn Bhd       |                                   1 |
+| P0003        | Hup Seng Book Sdn Bhd       |                                   1 |
+| P0004        | Kanying Publication Sdn Bhd |                                   3 |
+| P0006        | Rosmah Book Sdn Bhd         |                                   1 |
+| P0007        | Pernebit UM                 |                                   1 |
+| P0008        | Pelangor Pubishing Group    |                                   1 |
+| P0009        | Sental Press Sdn Bhd        |                                   1 |
+| P0010        | Ali Publication Sdn Bhd     |                                   1 |
++--------------+-----------------------------+-------------------------------------+
+8 rows in set (0.00 sec)
+
+mysql> SELECT * FROM Book
+    -> WHERE Book_Year>2000
+    -> AND Price>20.00;
++-------------------+-----------+--------------+-----------+-------------------------+-------+-----------+
+| Book_ISBN         | Author_ID | Publisher_ID | Book_Year | Book_Title              | Price | Book_Type |
++-------------------+-----------+--------------+-----------+-------------------------+-------+-----------+
+| 978-1-60309-454-2 | A002      | P0007        |      2003 | The Delicacy            | 24.99 | Fiction   |
+| 978-1-60309-514-3 | A003      | P0004        |      2018 | Under the River         | 24.99 | Fiction   |
+| 978-1-891830-02-0 | A010      | P0009        |      2006 | A Comic Strip Biography | 39.99 | Fiction   |
++-------------------+-----------+--------------+-----------+-------------------------+-------+-----------+
+3 rows in set (0.00 sec)
+
+mysql> SELECT Book.Book_ISBN, CountWB AS 'Number of Book in Storage',Book_Title
+    -> FROM Book ,Warehouse_Book AS W
+    -> WHERE Book.Book_ISBN=W.Book_ISBN
+    -> AND CountWB BETWEEN 4000 AND 8000;
++-------------------+---------------------------+-------------------------+
+| Book_ISBN         | Number of Book in Storage | Book_Title              |
++-------------------+---------------------------+-------------------------+
+| 978-1-60309-504-4 |                      5521 | The Graphic Novel       |
+| 978-1-60309-502-0 |                      4444 | Animal Stories          |
+| 978-1-60309-038-4 |                      4354 | Twinkle Power           |
+| 978-1-60309-344-6 |                      6543 | Lost Girls              |
+| 978-1-891830-02-0 |                      4692 | A Comic Strip Biography |
++-------------------+---------------------------+-------------------------+
+5 rows in set (0.00 sec)
+
+mysql> SELECT * FROM Competition
+    -> WHERE Competition_Date LIKE '%-10-%'
+    -> OR Competition_Date LIKE '%-12-%'
+    -> ORDER BY Competition_Date ASC;
++----------------+---------------------------------------------+------------------+
+| Competition_ID | Competition_Type                            | Competition_Date |
++----------------+---------------------------------------------+------------------+
+| C0060          | Bahasa Melayu Challenge Reading Competition | 2022-10-20       |
+| C0012          | Fairy Story Telling                         | 2022-10-23       |
+| C0023          | Poetry Reading                              | 2022-10-24       |
+| C0053          | Hokkien Challenge Reading Competition       | 2022-12-12       |
+| C0042          | Arabic Challenge Reading Competition        | 2022-12-20       |
+| C0044          | Cantonese Challenge Reading Competition     | 2022-12-21       |
+| C0046          | English Challenge Reading Competition       | 2022-12-22       |
++----------------+---------------------------------------------+------------------+
+7 rows in set (0.01 sec)
+
+mysql> SELECT * FROM Prize
+    -> WHERE Prize_Name LIKE 'Tng%';
++----------+----------+----------------+----------+-------------------+
+| Prize_ID | Score_ID | Participant_ID | Staff_ID | Prize_Name        |
++----------+----------+----------------+----------+-------------------+
+| PR002    | SD0208   | PT002          | ST222    | Tng Voucher RM150 |
+| PR004    | SD0110   | PT004          | ST640    | Tng Voucher RM120 |
+| PR008    | SD9014   | PT008          | ST007    | Tng Voucher RM120 |
+| PR012    | SD0820   | PT212          | ST822    | Tng Voucher RM120 |
++----------+----------+----------------+----------+-------------------+
+4 rows in set (0.00 sec)
+
+mysql> SELECT * FROM Warehouse
+    -> ORDER BY Bookstore_Code,Warehouse_Code ASC;
++----------------+----------------+-----------------+-------------------------------------------------------------+
+| Warehouse_Code | Bookstore_Code | Warehouse_Phone | Warehouse_Address                                           |
++----------------+----------------+-----------------+-------------------------------------------------------------+
+|         432133 | BS001          | 03-3257209      | Lot 345, Jalan Paramesara 1/4, 71800 Nilai, Negeri Sembilan |
+|         493110 | BS002          | 03-4837264      | Lot 98, Jalan Desa, 50000 Kuala Lumpur, Kuala Lumpur        |
+|         487411 | BS003          | 03-9742389      | Lot 25, Jalan Putera 2/9, 85000 Segamat, Johor              |
+|         401548 | BS004          | 02-4937474      | Lot 62, Jalan Abdullah 3/7, 43000 Kajang, Selangor          |
+|         443618 | BS004          | 01-8725892      | Lot 274, Jalan Bukit Besi, 50160 Titiwangsa, Kuala Lumpur   |
+|         437910 | BS005          | 01-9832424      | Lot 262, Jalan Arif 3/8, 46200 Petaling Jaya, Selangor      |
+|         432750 | BS006          | 06-3242788      | Lot 152, Jalan Bangsar, 52100 Kepong, Kuala Lumpur          |
+|         450929 | BS007          | 09-3423428      | Lot 7A, Jalan Perak, 46200 Petaling Jaya, Selangor          |
+|         455685 | BS008          | 07-3444783      | Lot D35, Jalan Minah, 80200 Johor Bharu, Johor              |
+|         489320 | BS008          | 09-4238253      | Lot 5A, Jalan Abdul, 43000 Kajang, Selangor                 |
+|         428170 | BS009          | 05-3427398      | Lot 2A, Jalan Perpaduan,  59513 Kuala Lumpur, Kuala Lumpur  |
+|         495979 | BS010          | 05-4234793      | Lot 34, Jalan Permai S1, 40172 Shah Alam, Selangor          |
++----------------+----------------+-----------------+-------------------------------------------------------------+
+12 rows in set (0.00 sec)
+
+mysql> SELECT S.Participant_ID,Participant_Name,S.Competition_ID, Competition_Type,Score_Total
+    -> FROM Participant AS P,Competition AS C, Score AS S
+    -> WHERE P.Participant_ID=S.Participant_ID
+    -> AND C.Competition_ID=S.Competition_ID
+    -> AND Score_Total =( 
+    -> SELECT MIN(Score_Total) FROM Score);
++----------------+----------------------------------+----------------+---------------------------------------+-------------+
+| Participant_ID | Participant_Name                 | Competition_ID | Competition_Type                      | Score_Total |
++----------------+----------------------------------+----------------+---------------------------------------+-------------+
+| PT007          | Nurul Farah Binti Abdulah Syabir | C0037          | Chinese Challenge Reading Competition |         425 |
++----------------+----------------------------------+----------------+---------------------------------------+-------------+
+1 row in set (0.01 sec)
+
+mysql> SELECT * FROM Book
+    -> WHERE Book_Year=(
+    -> SELECT MAX(Book_Year) FROM Book);
++-------------------+-----------+--------------+-----------+--------------------+-------+--------------+
+| Book_ISBN         | Author_ID | Publisher_ID | Book_Year | Book_Title         | Price | Book_Type    |
++-------------------+-----------+--------------+-----------+--------------------+-------+--------------+
+| 978-1-60309-492-4 | A004      | P0003        |      2022 | Doughnuts and Doom | 14.99 | ExerciseBook |
++-------------------+-----------+--------------+-----------+--------------------+-------+--------------+
+1 row in set (0.00 sec)
+
+mysql>  SELECT AVG(Score_Total)
+    ->  FROM Score;
++------------------+
+| AVG(Score_Total) |
++------------------+
+|         691.4167 |
++------------------+
+1 row in set (0.00 sec)
+
+mysql> SELECT Bookstore_Code, COUNT(Warehouse_Code) AS 'Number of Warehouse owned'
+    -> FROM Warehouse
+    -> GROUP BY Bookstore_Code;
++----------------+---------------------------+
+| Bookstore_Code | Number of Warehouse owned |
++----------------+---------------------------+
+| BS001          |                         1 |
+| BS002          |                         1 |
+| BS003          |                         1 |
+| BS004          |                         2 |
+| BS005          |                         1 |
+| BS006          |                         1 |
+| BS007          |                         1 |
+| BS008          |                         2 |
+| BS009          |                         1 |
+| BS010          |                         1 |
++----------------+---------------------------+
+10 rows in set (0.00 sec)
+
+mysql> SELECT Bookstore_Code,COUNT(Staff_ID) AS 'Number of Staff sent to help manage the competition'
+    -> FROM Staff
+    -> GROUP BY Bookstore_Code;
++----------------+-----------------------------------------------------+
+| Bookstore_Code | Number of Staff sent to help manage the competition |
++----------------+-----------------------------------------------------+
+| BS001          |                                                   1 |
+| BS002          |                                                   1 |
+| BS003          |                                                   1 |
+| BS004          |                                                   2 |
+| BS005          |                                                   1 |
+| BS006          |                                                   1 |
+| BS007          |                                                   1 |
+| BS008          |                                                   2 |
+| BS009          |                                                   1 |
+| BS010          |                                                   1 |
++----------------+-----------------------------------------------------+
+10 rows in set (0.00 sec)
+
+mysql> SELECT B.Book_ISBN, Book_Title, SUM(CountWB) AS 'Stock Quantity'
+    -> FROM Warehouse_Book AS W, Book AS B
+    -> WHERE W.Book_ISBN=B.Book_ISBN
+    -> GROUP BY B.Book_ISBN;
++-------------------+---------------------------------------+----------------+
+| Book_ISBN         | Book_Title                            | Stock Quantity |
++-------------------+---------------------------------------+----------------+
+| 978-1-60309-038-4 | Twinkle Power                         |           5588 |
+| 978-1-60309-344-6 | Lost Girls                            |           6543 |
+| 978-1-60309-454-2 | The Delicacy                          |           3245 |
+| 978-1-60309-492-4 | Doughnuts and Doom                    |           3465 |
+| 978-1-60309-502-0 | Animal Stories                        |           4444 |
+| 978-1-60309-504-4 | The Graphic Novel                     |           5521 |
+| 978-1-60309-505-1 | The League of Extraordinary Gentlemen |           2489 |
+| 978-1-60309-513-6 | Highwater Pants                       |          11391 |
+| 978-1-60309-514-3 | Under the River                       |           8763 |
+| 978-1-891830-02-0 | A Comic Strip Biography               |           4692 |
++-------------------+---------------------------------------+----------------+
+10 rows in set (0.00 sec)
+
+mysql> SELECT A.Author_ID,Author_Name,Book_Year, Book_Title
+    -> FROM Author AS A
+    -> LEFT JOIN Book ON A.Author_ID=Book.Author_ID;
++-----------+-----------------------------+-----------+---------------------------------------+
+| Author_ID | Author_Name                 | Book_Year | Book_Title                            |
++-----------+-----------------------------+-----------+---------------------------------------+
+| A001      | Yew Kwang Hui               |      2008 | Twinkle Power                         |
+| A002      | Samsudin Abdullah bin Fakri |      2003 | The Delicacy                          |
+| A003      | Chetan A/L Bangla           |      2018 | Under the River                       |
+| A004      | Grace Wong Jie Hui          |      2022 | Doughnuts and Doom                    |
+| A005      | Siti Khadijah binti Kamal   |      1995 | The League of Extraordinary Gentlemen |
+| A006      | Amrita A/P Pritia           |      NULL | NULL                                  |
+| A007      | Uthaya A/L Sankar           |      2017 | Highwater Pants                       |
+| A008      | Lim Kit Ching               |      2002 | Animal Stories                        |
+| A009      | Sarah Rosmah binti Abdullah |      1990 | Lost Girls                            |
+| A009      | Sarah Rosmah binti Abdullah |      1991 | The Graphic Novel                     |
+| A010      | Ali Abdulah bin Ahmad       |      2006 | A Comic Strip Biography               |
++-----------+-----------------------------+-----------+---------------------------------------+
+11 rows in set (0.00 sec)
+
+mysql> SELECT O.Bookstore_Code,Bookstore_Phone,WB.Book_ISBN,CountWB AS 'Number of books stored',W.Warehouse_Code,Warehouse_Address
+    -> FROM OnlineBookstore AS O, Warehouse_Book AS WB, Warehouse AS W
+    -> WHERE O.Bookstore_Code=W.Bookstore_Code
+    -> AND W.Warehouse_Code=WB.Warehouse_Code
+    -> AND (Warehouse_Address LIKE '%Selangor'
+    -> OR Warehouse_Address LIKE '%Kuala Lumpur');
++----------------+-----------------+-------------------+------------------------+----------------+------------------------------------------------------------+
+| Bookstore_Code | Bookstore_Phone | Book_ISBN         | Number of books stored | Warehouse_Code | Warehouse_Address                                          |
++----------------+-----------------+-------------------+------------------------+----------------+------------------------------------------------------------+
+| BS004          | 09-3489124      | 978-1-60309-513-6 |                   2368 |         401548 | Lot 62, Jalan Abdullah 3/7, 43000 Kajang, Selangor         |
+| BS009          | 02-2342342      | 978-1-60309-504-4 |                   5521 |         428170 | Lot 2A, Jalan Perpaduan,  59513 Kuala Lumpur, Kuala Lumpur |
+| BS006          | 06-9214714      | 978-1-60309-038-4 |                   4354 |         432750 | Lot 152, Jalan Bangsar, 52100 Kepong, Kuala Lumpur         |
+| BS005          | 03-7467846      | 978-1-60309-514-3 |                   8763 |         437910 | Lot 262, Jalan Arif 3/8, 46200 Petaling Jaya, Selangor     |
+| BS004          | 09-3489124      | 978-1-60309-513-6 |                   9023 |         443618 | Lot 274, Jalan Bukit Besi, 50160 Titiwangsa, Kuala Lumpur  |
+| BS007          | 08-9827481      | 978-1-60309-505-1 |                   2489 |         450929 | Lot 7A, Jalan Perak, 46200 Petaling Jaya, Selangor         |
+| BS008          | 01-2421444      | 978-1-60309-038-4 |                   1234 |         489320 | Lot 5A, Jalan Abdul, 43000 Kajang, Selangor                |
+| BS002          | 03-4743647      | 978-1-60309-454-2 |                   3245 |         493110 | Lot 98, Jalan Desa, 50000 Kuala Lumpur, Kuala Lumpur       |
+| BS010          | 04-3423424      | 978-1-891830-02-0 |                   4692 |         495979 | Lot 34, Jalan Permai S1, 40172 Shah Alam, Selangor         |
++----------------+-----------------+-------------------+------------------------+----------------+------------------------------------------------------------+
+9 rows in set (0.00 sec)
+
+mysql> SELECT P.Participant_ID,Participant_Name,Participant_Type,Score_Total, Competition_Type,Competition_Date,Prize_Name
+    -> FROM Participant AS P,Score AS S,Competition AS C,Prize
+    -> WHERE P.Participant_ID=S.Participant_ID
+    -> AND S.Competition_ID=C.Competition_ID
+    -> AND Prize.Score_ID=S.Score_ID;
++----------------+----------------------------------+------------------+-------------+---------------------------------------------+------------------+-----------------------+
+| Participant_ID | Participant_Name                 | Participant_Type | Score_Total | Competition_Type                            | Competition_Date | Prize_Name            |
++----------------+----------------------------------+------------------+-------------+---------------------------------------------+------------------+-----------------------+
+| PT001          | Kelvin Liew Wei Wen              | Malaysian        |         645 | News Reader                                 | 2022-09-25       | Book Voucher RM50     |
+| PT002          | Vijaya A/P Rajeswaran            | Malaysian        |         756 | Fairy Story Telling                         | 2022-10-23       | Tng Voucher RM150     |
+| PT003          | Leong Zi Shan                    | Malaysian        |         858 | Poetry Reading                              | 2022-10-24       | Book Voucher RM150    |
+| PT004          | Ahmad Muqri Bin Zahir            | Malaysian        |         452 | Spanish Challenge Reading Competition       | 2022-11-15       | Tng Voucher RM120     |
+| PT005          | Syed Saddiq Bin Muhammad         | Malaysian        |         654 | Japanese Challenge Reading Competition      | 2022-11-16       | GrabPay Voucher RM100 |
+| PT006          | Mohamad Sanjaya Bin Kamal        | Malaysian        |         999 | German Challenge Reading Competition        | 2022-11-17       | Lazada Voucher RM100  |
+| PT007          | Nurul Farah Binti Abdulah Syabir | Malaysian        |         425 | Chinese Challenge Reading Competition       | 2022-11-18       | Shopee Voucher RM120  |
+| PT008          | Yogeshwaran A/L Kumar            | Malaysian        |         534 | Arabic Challenge Reading Competition        | 2022-12-20       | Tng Voucher RM120     |
+| PT010          | Leanne Lee Yan Ting              | Malaysian        |         657 | English Challenge Reading Competition       | 2022-12-22       | Book Voucher RM200    |
+| PT011          | Syafina binti Fadillah           | Malaysian        |         895 | Hokkien Challenge Reading Competition       | 2022-12-12       | Lazada Voucher RM120  |
+| PT209          | Chen Dong Pin                    | Foreigner        |         756 | Cantonese Challenge Reading Competition     | 2022-12-21       | Shopee Voucher RM200  |
+| PT212          | Carla W. Jamerson                | Foreigner        |         666 | Bahasa Melayu Challenge Reading Competition | 2022-10-20       | Tng Voucher RM120     |
++----------------+----------------------------------+------------------+-------------+---------------------------------------------+------------------+-----------------------+
+12 rows in set (0.00 sec)
+
